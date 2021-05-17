@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Suite1" verbose="1" >
+    <test name="Regression1" thread-count="2" > <!--parallel="classes"-->
+        <classes>
+            <class name="home.TestHomePage" />
+            <class name="resources.TestResourcesPage" />
+            <class name="forums.TestForumsSearch" />
+            <class name="admin.TestParabankAdminPage" />
+        </classes>
+    </test>
+
+</suite>
