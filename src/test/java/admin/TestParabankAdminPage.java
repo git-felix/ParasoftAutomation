@@ -23,8 +23,8 @@ public class TestParabankAdminPage extends BaseTests {
         adminPage.setMinimalBalance(getRandomNumber());
         adminPage.setLoanProcessorType("combined");
         // check for mandatory fields to be filled in before pressing the 'Submit' button
-        assertFalse(adminPage.getInitialBalance().isEmpty());
-        assertFalse(adminPage.getMinimalBalance().isEmpty());
+        assertFalse(adminPage.getInitialBalanceValue().isEmpty());
+        assertFalse(adminPage.getMinimalBalanceValue().isEmpty());
         // submit the application
         adminPage.pressSubmitBtn();
         // check for successful submission
@@ -73,31 +73,37 @@ public class TestParabankAdminPage extends BaseTests {
     @DataProvider(name = "applicationData")
     public Object[][] getAppDataInputs() {
         return new Object[][] {
-                {"C++", "C++"},
-                {"test", "test"},
-                {"selenium", "selenium"},
-                {"automation", "automat"}   // 'automat' because results can include 'automation' or 'automate' values
+                {"application1/xml", 512.25, 64.95, "funds", 20},
+                {"application2/xml", 51.50, 58.35, "down", 45},
+                {"application3/xml", 402.64, 97.75, "combined", 72},
         };
     }
 
-    @Test
-    public void testApplicationDataSaving() throws IOException {
+    @Test(dataProvider = "applicationData")
+    public void testApplicationDataSaving(
+            String webService, double initBalance, double minBalance, String loanType, int threshold
+    ) throws IOException {
         ParabankHomePage parabankHomePageStart = homePage.getQuickParabankHomePage();
         ParabankAdminPage adminPage = parabankHomePageStart.clickAdminPage();
         adminPage.setDataAccessMode();
-        adminPage.fillWebServiceEndpointREST("application1/xml");
-        adminPage.setInitialBalance(512.25);
-        adminPage.setMinimalBalance(64.75);
-        adminPage.setLoanProcessorType("down");
-        // check for mandatory fields to be filled in before pressing the 'Submit' button
-        assertFalse(adminPage.getInitialBalance().isEmpty());
-        assertFalse(adminPage.getMinimalBalance().isEmpty());
+        adminPage.fillWebServiceEndpointREST(webService);
+        adminPage.setInitialBalance(initBalance);
+        adminPage.setMinimalBalance(minBalance);
+        adminPage.setLoanProcessorType(loanType);
+        adminPage.setThreshold(threshold);
         // submit the application
         adminPage.pressSubmitBtn();
         // check for successful submission
         assertEquals(adminPage.getSubmissionStatus(), "Settings saved successfully.");
         // start checking the data being saved
-
+        adminPage.refreshPage();
+        parabankHomePageStart = homePage.getQuickParabankHomePage();
+        adminPage = parabankHomePageStart.clickAdminPage();
+        // assert saved data
+        assertEquals(adminPage.getRESTEndpointValue(), webService);
+        assertEquals(adminPage.getInitialBalanceValue(), String.valueOf(initBalance));
+        assertEquals(adminPage.getMinimalBalanceValue(), String.valueOf(minBalance));
+        assertEquals(adminPage.getThresholdValue(), String.valueOf(threshold));
 
     }
 }

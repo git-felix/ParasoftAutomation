@@ -77,6 +77,15 @@ public class ParabankAdminPage {
         }
         else { throw new IOException("Error: Min.Balance field is not editable"); }
     }
+    public void setThreshold(int threshold) throws IOException {
+        WebElement thresholdInput = createFluentWait(2000, 100)
+                .until(ExpectedConditions.visibilityOfElementLocated(loanProcessorThreshold));
+        if(thresholdInput.isEnabled()) {
+            clearFieldValue(thresholdInput);
+            thresholdInput.sendKeys(String.valueOf(threshold));
+        }
+        else { throw new IOException("Error: Min.Balance field is not editable"); }
+    }
 
     public void clearFieldValue(WebElement inputField) {
         if( ! inputField.getAttribute("value").isEmpty() ) {
@@ -95,11 +104,17 @@ public class ParabankAdminPage {
     }
 
     // getter functions for mandatory fields of balance
-    public String getInitialBalance() {
+    public String getRESTEndpointValue() {
+        return driver.findElement(inputWebServiceEndpointREST).getAttribute("value");
+    }
+    public String getInitialBalanceValue() {
         return driver.findElement(initialBalance).getAttribute("value");
     }
-    public String getMinimalBalance() {
+    public String getMinimalBalanceValue() {
         return driver.findElement(minimalBalance).getAttribute("value");
+    }
+    public String getThresholdValue() {
+        return driver.findElement(loanProcessorThreshold).getAttribute("value");
     }
 
     public void setLoanProcessorType(String loanProcessorType) {
@@ -132,7 +147,6 @@ public class ParabankAdminPage {
         return "";
     }
 
-
     // submit the filled in applications
     public void pressSubmitBtn() {
         driver.findElement(submitBtn).click();
@@ -141,5 +155,7 @@ public class ParabankAdminPage {
     public String getSubmissionStatus() {
         return driver.findElement(submissionStatus).getText();
     }
+
+    public void refreshPage() { driver.navigate().refresh(); }
 
 }
